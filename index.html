@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Grade Recovery Calculator</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    label { display: block; margin-top: 15px; }
+    input, button { margin-top: 5px; padding: 8px; font-size: 16px; width: 300px; }
+    #result { margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>📊 Grade Recovery Calculator</h2>
+
+  <label>Enter existing scores (comma-separated):</label>
+  <input id="scores" placeholder="e.g. 0, 75, 80, 65">
+
+  <label>Expected score on future assignments:</label>
+  <input id="futureScore" type="number" placeholder="e.g. 95">
+
+  <label>Target average:</label>
+  <input id="target" type="number" placeholder="e.g. 85">
+
+  <button onclick="calculate()">Calculate</button>
+
+  <div id="result"></div>
+
+  <script>
+    function calculate() {
+      const scoreStr = document.getElementById("scores").value;
+      const scoreArr = scoreStr.split(',').map(s => parseFloat(s.trim())).filter(s => !isNaN(s));
+      const futureScore = parseFloat(document.getElementById("futureScore").value);
+      const target = parseFloat(document.getElementById("target").value);
+
+      if (scoreArr.length === 0 || isNaN(futureScore) || isNaN(target)) {
+        document.getElementById("result").innerText = "❗ Please enter valid values in all fields.";
+        return;
+      }
+
+      const currentTotal = scoreArr.reduce((sum, s) => sum + s, 0);
+      const currentCount = scoreArr.length;
+
+      // Equation: (currentTotal + futureScore * x) / (currentCount + x) = target
+      // Solve for x:
+      const numerator = target * currentCount - currentTotal;
+      const denominator = futureScore - target;
+
+      if (denominator <= 0) {
+        document.getElementById("result").innerText =
+          "❗ With that future score, it's not possible to reach your target average.";
+        return;
+      }
+
+      const x = Math.ceil(numerator / denominator);
+
+      if (x <= 0) {
+        document.getElementById("result").innerText =
+          "🎉 You’ve already met or exceeded your target average!";
+      } else {
+        document.getElementById("result").innerText =
+          `📈 You need to score ${futureScore} on ${x} more assignment(s) to reach an average of ${target}.`;
+      }
+    }
+  </script>
+</body>
+</html>
